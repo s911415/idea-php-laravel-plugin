@@ -8,7 +8,7 @@ plugins {
     id("org.jetbrains.kotlin.jvm") version "1.7.10"
 
     // Gradle IntelliJ Plugin
-    id("org.jetbrains.intellij") version "1.13.1"
+    id("org.jetbrains.intellij") version "1.13.3"
 }
 
 group = properties("pluginGroup")
