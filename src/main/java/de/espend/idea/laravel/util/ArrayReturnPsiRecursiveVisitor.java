@@ -60,7 +60,7 @@ public class ArrayReturnPsiRecursiveVisitor extends PsiRecursiveElementWalkingVi
 
                 List<String> myContext = new ArrayList<>(context);
                 myContext.add(((StringLiteralExpression) arrayKey).getContents());
-                String keyName = StringUtils.join(myContext, ".");
+                String keyName = String.join(".", myContext);
 
                 if(arrayValue instanceof ArrayCreationExpression) {
                     arrayKeyVisitor.visit(keyName, arrayKey, true);

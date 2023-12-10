@@ -239,7 +239,7 @@ public class ControllerReferences implements GotoCompletionLanguageRegistrar {
         List<String> groupNamespaces = RouteGroupUtil.getRouteGroupPropertiesCollection(element, "namespace");
 
         if(groupNamespaces.size() > 0) {
-            return StringUtils.stripStart(StringUtils.join(groupNamespaces, "\\"), "\\");
+            return StringUtils.stripStart(String.join("\\", groupNamespaces), "\\");
         } else {
             return null;
         }

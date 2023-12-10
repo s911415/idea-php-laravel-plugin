@@ -156,7 +156,7 @@ public class RoutingUtil {
          */
         @NotNull
         private String getRouteNamePrefix(PsiElement element) {
-            return StringUtils.join(RouteGroupUtil.getRouteGroupPropertiesCollection(element, "as"), "");
+            return String.join("", RouteGroupUtil.getRouteGroupPropertiesCollection(element, "as"));
         }
 
         private void visitAs(@NotNull MethodReference methodReference, @NotNull String prefix) {
