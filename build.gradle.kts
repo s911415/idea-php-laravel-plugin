@@ -1,52 +1,51 @@
-fun properties(key: String) = project.findProperty(key).toString()
+fun properties(key: String) = providers.gradleProperty(key)
+fun environment(key: String) = providers.environmentVariable(key)
 
 plugins {
-    // Java support
-    id("java")
-
-    // Kotlin support
-    id("org.jetbrains.kotlin.jvm") version "1.7.10"
-
-    // Gradle IntelliJ Plugin
-    id("org.jetbrains.intellij") version "1.13.3"
+    id("java") // Java support
+    alias(libs.plugins.kotlin) // Kotlin support
+    alias(libs.plugins.gradleIntelliJPlugin) // Gradle IntelliJ Plugin
 }
 
-group = properties("pluginGroup")
-version = properties("pluginVersion")
+group = properties("pluginGroup").get()
+version = properties("pluginVersion").get()
 
 // Configure project's dependencies
 repositories {
-    jcenter()
     mavenCentral()
 }
 
-// Set the JVM language level used to compile sources and generate files - Java 11 is required since 2020.3
+// Dependencies are managed with Gradle version catalog - read more: https://docs.gradle.org/current/userguide/platforms.html#sub:version-catalog
+dependencies {
+//    implementation(libs.annotations)
+}
+
+// Set the JVM language level used to build the project.
 kotlin {
-    jvmToolchain {
-        languageVersion.set(JavaLanguageVersion.of(17))
-    }
+    jvmToolchain(17)
 }
 
 // Configure Gradle IntelliJ Plugin - read more: https://plugins.jetbrains.com/docs/intellij/tools-gradle-intellij-plugin.html
 intellij {
-    pluginName.set(properties("pluginName"))
-    version.set(properties("platformVersion"))
-    type.set(properties("platformType"))
+    pluginName = properties("pluginName")
+    version = properties("platformVersion")
+    type = properties("platformType")
 
     // Plugin Dependencies. Uses `platformPlugins` property from the gradle.properties file.
-    plugins.set(properties("platformPlugins").split(',').map(String::trim).filter(String::isNotEmpty))
+    plugins = properties("platformPlugins").map { it.split(',').map(String::trim).filter(String::isNotEmpty) }
 }
 
 tasks {
     wrapper {
-        gradleVersion = properties("gradleVersion")
+        gradleVersion = properties("gradleVersion").get()
     }
 
     patchPluginXml {
-        version.set(properties("pluginVersion"))
-        sinceBuild.set(properties("pluginSinceBuild"))
-        untilBuild.set(properties("pluginUntilBuild"))
+        version = properties("pluginVersion")
+        sinceBuild = properties("pluginSinceBuild")
+        untilBuild = properties("pluginUntilBuild")
 
+        // Extract the <!-- Plugin description --> section from README.md and provide for the plugin's manifest
         pluginDescription.set(
                 "It's dead, no description"
         )
@@ -62,17 +61,17 @@ tasks {
     }
 
     signPlugin {
-        certificateChain.set(System.getenv("CERTIFICATE_CHAIN"))
-        privateKey.set(System.getenv("PRIVATE_KEY"))
-        password.set(System.getenv("PRIVATE_KEY_PASSWORD"))
+        certificateChain = environment("CERTIFICATE_CHAIN")
+        privateKey = environment("PRIVATE_KEY")
+        password = environment("PRIVATE_KEY_PASSWORD")
     }
 
     publishPlugin {
         dependsOn("patchChangelog")
-        token.set(System.getenv("PUBLISH_TOKEN"))
-        // pluginVersion is based on the SemVer (https://semver.org) and supports pre-release labels, like 2.1.7-alpha.3
+        token = environment("PUBLISH_TOKEN")
+        // The pluginVersion is based on the SemVer (https://semver.org) and supports pre-release labels, like 2.1.7-alpha.3
         // Specify pre-release label to publish the plugin in a custom Release Channel automatically. Read more:
         // https://plugins.jetbrains.com/docs/intellij/deployment.html#specifying-a-release-channel
-        channels.set(listOf(properties("pluginVersion").split('-').getOrElse(1) { "default" }.split('.').first()))
+        channels = properties("pluginVersion").map { listOf(it.substringAfter('-', "").substringBefore('.').ifEmpty { "default" }) }
     }
 }
