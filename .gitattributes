@@ -1,0 +1,9 @@
+# These files are text and should be normalized (Convert crlf => lf)
+*.gitattributes text
+.gitignore      text
+*.md            text diff=markdown
+
+# Common build-tool wrapper scripts ('.cmd' versions are handled by 'Common.gitattributes')
+mvnw            text eol=lf
+gradlew         text eol=lf
+gradlew         text eol=lf

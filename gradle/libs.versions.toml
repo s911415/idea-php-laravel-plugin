@@ -3,8 +3,8 @@
 annotations = "24.1.0"
 
 # plugins
-kotlin = "1.9.23"
-gradleIntelliJPlugin = "1.17.2"
+gradleIntelliJPlugin = "1.17.4"
+kotlin = "1.9.25"
 
 [libraries]
 annotations = { group = "org.jetbrains", name = "annotations", version.ref = "annotations" }
